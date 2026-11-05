@@ -1,16 +1,25 @@
-/* find.s */
+/* find.s - Lab 19, Part B, Stage C */
 
 /* format strings for I/O */
         .section        .rodata
         .align  2
-prompt: .asciz "Enter character: : "
+prompt: .asciz "Enter character: "
         .align  2
-scanf:
+scanf_fmt:
         .asciz "%c"
         .align  2
 confirm: .asciz "In case you forgot, you input %c\n"
+        .align  2
+line_prompt:
+        .asciz "Enter a line of input:\n"
+        .align  2
+result:
+        .asciz "Length: %d\nBuffer: %s\n"
 
-
+/* buffer for input line */
+        .data
+        .align  2
+buff:   .space 100
 
 /* main program */
         .text
@@ -19,18 +28,38 @@ confirm: .asciz "In case you forgot, you input %c\n"
 main:
         push    {fp, lr}        @ setup stack frame
         add     fp, sp, #4
-        sub     sp, sp, #8      @ #8 for 1 local variables
-        @ [fp, #-8] is ch, first char variable
+        sub     sp, sp, #8      @ space for 2 local variables
+        @ [fp, #-8] is ch, input character
+        @ [fp, #-12] is ct, number of characters
 
         ldr     r0, promptP     @ print prompt
         bl      printf
-        ldr     r0, scanfP  @ read char
+
+        ldr     r0, scanfP      @ read character
         sub     r1, fp, #8
         bl      __isoc99_scanf
 
-        ldr     r0, [fp, #-8]	
-        ldr     r0, confirmP     @ print confirmation
-        ldr     r1, [fp, #-8]   
+        ldr     r0, confirmP    @ print confirmation
+        ldrb    r1, [fp, #-8]
+        bl      printf
+
+        @ consume newline after character
+        ldr     r0, buffP
+        mov     r1, #100
+        bl      get_line
+
+        ldr     r0, line_promptP  @ prompt for input line
+        bl      printf
+
+        ldr     r0, buffP       @ read input line into buff
+        mov     r1, #100
+        bl      get_line
+
+        str     r0, [fp, #-12]  @ store return value in ct
+
+        ldr     r0, resultP     @ print ct and buff
+        ldr     r1, [fp, #-12]
+        ldr     r2, buffP
         bl      printf
 
         mov     r0, #0          @ assign 0 as return value
@@ -42,6 +71,12 @@ main:
 promptP:
         .word   prompt
 scanfP:
-        .word   scanf     
+        .word   scanf_fmt
 confirmP:
         .word   confirm
+line_promptP:
+        .word   line_prompt
+resultP:
+        .word   result
+buffP:
+        .word   buff
