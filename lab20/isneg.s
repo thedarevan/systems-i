@@ -19,23 +19,21 @@ result: .asciz "isneg(%d) returns %d\n"
         .text
         .align  2
         .global isneg
+/* isneg function - temporary version */
+/* Argument: r0 = val
+   Return: always 1
+*/
+        .text
+        .align  2
+        .global isneg
 isneg:
         push    {fp, lr}        @ setup stack frame
         add     fp, sp, #4
 
-        cmp     r0, #0          @ if val < 0
-        bge     else
+        mov     r0, #1          @ return 1
 
-        mov     r0, #1          @ then return 1
-        b       next
-
-else:
-        mov     r0, #0          @ else return 0
-
-next:
         sub     sp, fp, #4      @ tear down stack frame
         pop     {fp, pc}
-
 /* main program */
         .text
         .align  2
