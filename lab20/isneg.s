@@ -1,4 +1,4 @@
-/* isneg.s - Lab 20, Part B1 */
+/* isneg.s - Lab 20, Part B1a */
 
 /* format strings for I/O */
         .section        .rodata
@@ -10,30 +10,6 @@ scanf_fmt:
         .align  2
 result: .asciz "isneg(%d) returns %d\n"
 
-/* isneg function */
-/* isneg(val)
-   Returns 1 if val is negative, 0 otherwise.
-   Argument: r0 = val
-   Return: r0 = 1 or 0
-*/
-        .text
-        .align  2
-        .global isneg
-/* isneg function - temporary version */
-/* Argument: r0 = val
-   Return: always 1
-*/
-        .text
-        .align  2
-        .global isneg
-isneg:
-        push    {fp, lr}        @ setup stack frame
-        add     fp, sp, #4
-
-        mov     r0, #1          @ return 1
-
-        sub     sp, fp, #4      @ tear down stack frame
-        pop     {fp, pc}
 /* main program */
         .text
         .align  2
@@ -41,9 +17,8 @@ isneg:
 main:
         push    {fp, lr}        @ setup stack frame
         add     fp, sp, #4
-        sub     sp, sp, #8      @ space for local variables
+        sub     sp, sp, #8      @ space for local variable
         @ [fp, #-8] is x, input integer
-        @ [fp, #-12] is result of isneg(x)
 
         ldr     r0, promptP     @ print prompt
         bl      printf
@@ -52,13 +27,9 @@ main:
         sub     r1, fp, #8
         bl      __isoc99_scanf
 
-        ldr     r0, [fp, #-8]   @ call isneg(x)
-        bl      isneg
-        str     r0, [fp, #-12]  @ store return value
-
         ldr     r0, resultP     @ print result
         ldr     r1, [fp, #-8]
-        ldr     r2, [fp, #-12]
+        mov     r2, #1          @ always print 1
         bl      printf
 
         mov     r0, #0          @ assign 0 as return value
