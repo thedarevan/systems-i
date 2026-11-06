@@ -68,22 +68,34 @@ main:
         ldr     r2, buffP
         bl      printf
 
-	mov     r0, #0          @ initialize i = 0
+        mov     r0, #0          @ initialize i = 0
         str     r0, [fp, #-16]
 
-       	ldr     r0, buffP       @ get buff[i]
+loop:
+        ldr     r0, [fp, #-16]  @ while i < ct
+        ldr     r1, [fp, #-12]
+        cmp     r0, r1
+        bge     next
+
+        ldr     r0, buffP       @ get buff[i]
         ldr     r1, [fp, #-16]
         bl      get_byte
 
         ldrb    r1, [fp, #-8]   @ if buff[i] == ch
         cmp     r0, r1
-        bne     next
+        bne     skip
 
         ldr     r0, index_fmtP  @ then print index i
         ldr     r1, [fp, #-16]
         bl      printf
 
-next:
+skip:
+        ldr     r0, [fp, #-16]  @ increment i
+        add     r0, r0, #1
+        str     r0, [fp, #-16]
+        b       loop
+
+next:	
         ldr     r0, newlineP    @ print newline
         bl      printf
 
