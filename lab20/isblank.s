@@ -26,8 +26,16 @@ isblank:
         push    {fp, lr}        @ setup stack frame
         add     fp, sp, #4
 
-        mov     r0, #1          @ always return 1
+        cmp     r0, #32         @ compare val to ASCII space
+        bne     else
 
+        mov     r0, #1          @ return 1 if val == 32
+        b       next
+
+else:
+        mov     r0, #0          @ return 0 otherwise
+
+next:
         sub     sp, fp, #4      @ tear down stack frame
         pop     {fp, pc}
 
